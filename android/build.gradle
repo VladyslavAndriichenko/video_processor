@@ -17,6 +17,7 @@ allprojects {
         jcenter()
     }
 }
+ext.flutterFFmpegPackage = 'full'
 
 rootProject.buildDir = '../build'
 subprojects {

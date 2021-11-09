@@ -26,6 +26,22 @@
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
+	<key>NSAppleMusicUsageDescription</key>
+    <string>To managed recorded videos</string>
+    <key>NSCameraUsageDescription</key>
+    <string>To record videos from camera.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>To be able to record videos with sound.</string>
+    <key>NSMotionUsageDescription</key>
+    <string>To save location of recorded videos.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Camera App would like to save photos from the app to your gallery</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>To select videos from gallery.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>To extract audio from recorded videos</string>
+
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
