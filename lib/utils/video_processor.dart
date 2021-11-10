@@ -42,15 +42,18 @@ class VideoProcessor {
     return videoPath;
   }
 
+  // todo: refactor to 3 methods
   Future<String> combineVideosReturnFileName(List<String> files) async {
     var appDocumentDirectory = await getApplicationDocumentsDirectory();
     if (files.length == 1) {
+      //todo: add comments
       var finalFilePath = '${appDocumentDirectory.path}/${combinedVideoBaseName}';
       var finalVideo = await File(files.first).copy(finalFilePath);
       return combinedVideoBaseName;
       // return finalVideo.path;
     }
 
+    // todo: method 1
     var extractedAudioList = <String>[];
     ///extract audio from each videos
     for (final filePathWithName in files) {
@@ -62,14 +65,18 @@ class VideoProcessor {
       extractedAudioList.add(audioFilePathWithName);
     }
 
+    // todo: method 2
     ///creating txt file of audios
     var audiosFilePath = '${appDocumentDirectory.path}/audios.txt';
     var audioListFile = await File(audiosFilePath).create();
 
     print('Start concat audios');
     ///concat audios
+    /// todo: WHY DO WE NEED TO USE WAV. WRITE COMMENT HERE
     var finalAudioFilePath = '${dirname(audiosFilePath)}/${basenameWithoutExtension(audiosFilePath)}.wav';
 
+
+    // todo: method 3
     String concatAudiosCommand = '-y ';
     for (final audioPath in extractedAudioList) {
       concatAudiosCommand += '-i $audioPath ';
@@ -84,6 +91,7 @@ class VideoProcessor {
     var fileAudio = File(finalAudioFilePath);
     var isAudioExist = await fileAudio.exists();
 
+    // todo: method 4
     ///remove audio from each videos and save new videos
     var videoWithoutAudioList = <String>[];
     for (final filePathWithName in files) {

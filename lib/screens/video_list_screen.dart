@@ -42,7 +42,12 @@ class _VideoListScreenState extends State<VideoListScreen> {
           ),
         ],
       ),
-      body: BlocBuilder<VideoProcessorBloc, VideoProcessorState>(
+      body: BlocConsumer<VideoProcessorBloc, VideoProcessorState>(
+        listener: (context, state) {
+          // if (state.) {
+          //   showDi
+          // }
+        },
         builder: (context, state) {
           if (state.isLoading()) {
             return Center(child: CircularProgressIndicator());
@@ -54,6 +59,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
+                    // todo: try to make it reusable
                     child: ListView(
                       padding: EdgeInsets.symmetric(),
                       children: indexedMap(

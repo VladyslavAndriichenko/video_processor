@@ -5,6 +5,7 @@ abstract class VideoProcessorEvent {}
 
 class InitializeVideoProcessor extends VideoProcessorEvent {}
 class PickUpVideoEvent extends VideoProcessorEvent {
+  // todo: REMOVE!
   final BuildContext context;
 
   PickUpVideoEvent(this.context);

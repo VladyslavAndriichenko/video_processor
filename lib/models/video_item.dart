@@ -1,15 +1,25 @@
+import 'dart:convert';
+
 class VideoItem {
+  //todo: add ID
   final String videoName;
-  // final String videoText;
 
   VideoItem({this.videoName,
-    // this.videoText,
   });
 
   VideoItem copyWith({String videoName, String videoText}) => VideoItem(
     videoName: videoName ?? this.videoName,
-    // videoText: videoText ?? this.videoText,
   );
 
+  factory VideoItem.fromJson(String str) => VideoItem.fromMap(jsonDecode(str));
 
+  String toJson() => json.encode(toMap());
+
+  factory VideoItem.fromMap(Map<String, dynamic> json) => VideoItem(
+    videoName: json["videoName"],
+  );
+
+  Map<String, dynamic> toMap() => {
+    "videoName": videoName,
+  };
 }

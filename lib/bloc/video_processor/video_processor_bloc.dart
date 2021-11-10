@@ -8,12 +8,19 @@ import 'package:video_processor/app.dart';
 import 'package:video_processor/bloc/video_processor/video_processor_event.dart';
 import 'package:video_processor/bloc/video_processor/video_processor_state.dart';
 import 'package:video_processor/models/video_item.dart';
+import 'package:video_processor/storage/base_storage.dart';
 import 'package:video_processor/utils/video_processor.dart';
 import 'package:video_processor/widgets/dialogs/basic_dialog.dart';
 import 'package:path/path.dart';
 
+// todo: Migrate to flutter 2.0
+// todo: USE linter from provider starter
+// todo: use bloc version 7+
 class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> {
-  VideoProcessorBloc() : super(VideoProcessorState.uninitialized());
+
+  final BaseStorage storage;
+
+  VideoProcessorBloc({this.storage}) : super(VideoProcessorState.uninitialized());
 
   @override
   Stream<VideoProcessorState> mapEventToState(VideoProcessorEvent event) async* {
@@ -29,7 +36,8 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
   }
 
   Stream<VideoProcessorState> _initializeVideoProcessor(InitializeVideoProcessor event) async* {
-    yield VideoProcessorState.initialized();
+    final savedVideos = await storage.retrieveVideoList();
+    yield VideoProcessorState.initialized(videoCardList: savedVideos);
   }
 
   Stream<VideoProcessorState> _pickVideoEvent(PickUpVideoEvent event) async* {
@@ -42,7 +50,6 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
 
     await showDialog<bool>(
       useRootNavigator: false,
-      // context: event.context,
       context: globalKey.currentContext,
       builder: (context) => BasicDialog(
           useCancel: false,
@@ -63,7 +70,7 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
 
     final picker = ImagePicker();
     PickedFile pickedFile;
-
+// todo: move to new handler
     try {
       pickedFile = await picker.getVideo(source: videoSource, maxDuration: Duration(seconds: 60));
 
@@ -75,8 +82,10 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
       final cutVideoPath = await videoProcessor.cutVideo(pickedFile.path, pickedFile.path.hashCode.toString());
 
       if (videoSource == ImageSource.camera) await File(pickedFile.path).delete();
-      // final List<VideoItem> newList = [VideoItem(videoName: basename(cutVideoPath))];
-      yield curState.copyWith(videoCardList: curState.videoCardList..add(VideoItem(videoName: basename(cutVideoPath))));
+
+      final newVideoList = curState.videoCardList..add(VideoItem(videoName: basename(cutVideoPath)));
+      await storage.saveVideoList(newVideoList);
+      yield curState.copyWith(videoCardList: newVideoList);
     } catch (e, stackTrace) {
       yield curState.copyWith(errorMessage: e.toString());
       return;
@@ -91,6 +100,9 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
     } else {
       ///if contains selected item, do nothing
       if (state.selectedItemsIndexes.contains(event.videoIndex)) {
+        state.selectedItemsIndexes..remove(event.videoIndex);
+        //todo: RELY ON VIDEO ID
+        // final list = [...state.selectedItemsIndexes.where((element) => element.id != event.id)];
         yield state.copyWith(selectedItemsIndexes: state.selectedItemsIndexes..remove(event.videoIndex), isSelectableMode: true);
       } else {
         yield state.copyWith(selectedItemsIndexes: state.selectedItemsIndexes..add(event.videoIndex), isSelectableMode: true);
