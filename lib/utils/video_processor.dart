@@ -13,26 +13,26 @@ class VideoProcessor {
   static const combinedVideoBaseName = 'combined_video.mp4';
 
   ///Extract, decode and cut audio track from video file
-  Future<String> extractAudio(String path) async {
-    var appDocumentDirectory = await getApplicationDocumentsDirectory();
-
-    //Prepare empty file for audio output
-    var audioPath = '${appDocumentDirectory.path}/output-audio.wav';
-
-    //Command for Ffmpeg library
-    var command = '-y -i $path -ss 00:00:00 -to 00:00:59.900 -ac 1 -ar 16000 $audioPath';
-
-    //Execute command
-    var result = await ffmpeg.execute(command);
-    return audioPath;
-  }
+  // Future<String> extractAudio(String path) async {
+  //   var appDocumentDirectory = await getApplicationDocumentsDirectory();
+  //
+  //   //Prepare empty file for audio output
+  //   var audioPath = '${appDocumentDirectory.path}/output-audio.wav';
+  //
+  //   //Command for Ffmpeg library
+  //   var command = '-y -i $path -ss 00:00:00 -to 00:00:59.900 -ac 1 -ar 16000 $audioPath';
+  //
+  //   //Execute command
+  //   var result = await ffmpeg.execute(command);
+  //   return audioPath;
+  // }
 
   Future<String> cutVideo(String path, String outputName) async {
     var appDocumentDirectory = await getApplicationDocumentsDirectory();
 
     var videoPath = '${appDocumentDirectory.path}/$outputName.mp4';
 
-    //Command for Ffmpeg library
+    //Cut video to 1 min. If we want to cut to longer duration then minute, should use another method
     var command =
         '-y -i  $path -ss 00:00:00 -to 00:00:59.900 -r 30 -vf  \"[in]scale=iw*min(1920/iw\\,1080/ih):ih*min(1920/iw\\,1080/ih)[scaled]; [scaled]pad=1920:1080:(1920-iw*min(1920/iw\\,1080/ih))/2:(1080-ih*min(1920/iw\\,1080/ih))/2[padded]; [padded]setsar=1:1[out]\" -c:a copy $videoPath';
 

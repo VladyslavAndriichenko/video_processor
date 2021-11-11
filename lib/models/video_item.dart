@@ -1,14 +1,14 @@
 import 'dart:convert';
 
 class VideoItem {
-  //todo: add ID
-  final String? videoName;
+  final int? id;
+  final String videoName;
 
-  VideoItem({this.videoName,
-  });
+  VideoItem({required this.id, this.videoName = ''});
 
-  VideoItem copyWith({String? videoName, String? videoText}) => VideoItem(
+  VideoItem copyWith({String? videoName}) => VideoItem(
     videoName: videoName ?? this.videoName,
+    id: id,
   );
 
   factory VideoItem.fromJson(String str) => VideoItem.fromMap(jsonDecode(str));
@@ -16,10 +16,12 @@ class VideoItem {
   String toJson() => json.encode(toMap());
 
   factory VideoItem.fromMap(Map<String, dynamic> json) => VideoItem(
+    id: json["id"],
     videoName: json["videoName"],
   );
 
   Map<String, dynamic> toMap() => {
+    "id": id,
     "videoName": videoName,
   };
 }

@@ -26,7 +26,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
         actions: [
           BlocBuilder<VideoProcessorBloc, VideoProcessorState>(
             builder: (context, state) => Visibility(
-              visible: state.isSelectableMode ?? false,
+              visible: state.isSelectableMode,
               child: Container(
                 margin: EdgeInsets.only(right: 10),
                 child: IconButton(
@@ -111,7 +111,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
                               );
                             });
                             if (permissionResult) {
-                              context.read<VideoProcessorBloc>().add(PickUpVideoEvent(context));
+                              context.read<VideoProcessorBloc>().add(PickAndProcessVideoEvent());
                             }
                           },
                           buttonText: 'Choose video',

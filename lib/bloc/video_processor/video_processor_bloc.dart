@@ -26,8 +26,8 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
   Stream<VideoProcessorState> mapEventToState(VideoProcessorEvent event) async* {
     if (event is InitializeVideoProcessor) {
       yield* _initializeVideoProcessor(event);
-    } else if (event is PickUpVideoEvent) {
-      yield* _pickVideoEvent(event);
+    } else if (event is PickAndProcessVideoEvent) {
+      yield* _pickAndProcessVideoEvent(event);
     } else if (event is SelectVideoListItemEvent) {
       yield* _selectVideoListItemEvent(event);
     } else if (event is UnselectAllListItemsEvent) {
@@ -40,7 +40,7 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
     yield VideoProcessorState.initialized(videoCardList: savedVideos);
   }
 
-  Stream<VideoProcessorState> _pickVideoEvent(PickUpVideoEvent event) async* {
+  Stream<VideoProcessorState> _pickAndProcessVideoEvent(PickAndProcessVideoEvent event) async* {
     if (!state.isInitialized()) return;
 
     final VideoProcessorState curState = state;
@@ -69,21 +69,21 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
     if (videoSource == null) return;
 
     final picker = ImagePicker();
-    PickedFile? pickedFile;
-// todo: move to new handler
+    var pickedFile;
     try {
-      pickedFile = await picker.getVideo(source: videoSource!, maxDuration: Duration(seconds: 60));
-
+      pickedFile = await picker.pickVideo(source: videoSource!, maxDuration: Duration(seconds: 60));
       if (pickedFile == null || pickedFile.path == null || pickedFile.path.isEmpty) {
         yield curState.copyWith();
         return;
       }
+
       var videoProcessor = VideoProcessor(ffmpeg: FlutterFFmpeg());
       final cutVideoPath = await videoProcessor.cutVideo(pickedFile.path, pickedFile.path.hashCode.toString());
 
+      ///delete video which picked from camera
       if (videoSource == ImageSource.camera) await File(pickedFile.path).delete();
 
-      final newVideoList = curState.videoCardList!..add(VideoItem(videoName: basename(cutVideoPath)));
+      final newVideoList = curState.videoCardList!..add(VideoItem(id: DateTime.now().millisecondsSinceEpoch, videoName: basename(cutVideoPath)));
       await storage!.saveVideoList(newVideoList);
       yield curState.copyWith(videoCardList: newVideoList);
     } catch (e, stackTrace) {

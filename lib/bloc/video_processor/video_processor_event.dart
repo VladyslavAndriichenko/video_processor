@@ -4,12 +4,7 @@ import 'package:meta/meta.dart';
 abstract class VideoProcessorEvent {}
 
 class InitializeVideoProcessor extends VideoProcessorEvent {}
-class PickUpVideoEvent extends VideoProcessorEvent {
-  // todo: REMOVE!
-  final BuildContext context;
-
-  PickUpVideoEvent(this.context);
-}
+class PickAndProcessVideoEvent extends VideoProcessorEvent {}
 class DeleteSelectedVideosEvent extends VideoProcessorEvent {
   final List<int>? indexesForDelete;
 
