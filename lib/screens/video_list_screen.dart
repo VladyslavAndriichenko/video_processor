@@ -11,7 +11,7 @@ import 'package:video_processor/widgets/dialogs/basic_dialog.dart';
 import 'package:video_processor/widgets/video_list_item_widget.dart';
 
 class VideoListScreen extends StatefulWidget {
-  const VideoListScreen({Key key}) : super(key: key);
+  const VideoListScreen({Key? key}) : super(key: key);
 
   @override
   _VideoListScreenState createState() => _VideoListScreenState();
@@ -63,8 +63,8 @@ class _VideoListScreenState extends State<VideoListScreen> {
                     child: ListView(
                       padding: EdgeInsets.symmetric(),
                       children: indexedMap(
-                        state.videoCardList?.isEmpty ?? true ? List.empty() : state.videoCardList,
-                        (index, videoCard) => ListTile(
+                        state.videoCardList?.isEmpty ?? true ? List.empty() : state.videoCardList!,
+                        (index, dynamic videoCard) => ListTile(
                           title: VideoListItemWidget(videoName: videoCard.videoName),
                           onLongPress: () {
                             context

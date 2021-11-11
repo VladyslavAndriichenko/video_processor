@@ -9,13 +9,13 @@ class SharedPrefStorage extends BaseStorage {
   final String _videosKey = 'videos_key';
 
   @override
-  Future<List<VideoItem>> retrieveVideoList() async {
+  Future<List<VideoItem>?> retrieveVideoList() async {
     final prefs = await SharedPreferences.getInstance();
 
     try {
       final json = prefs.get(_videosKey);
       if (json != null) {
-        List<Map<String, dynamic>> list = jsonDecode(json).cast<Map<String, dynamic>>();
+        List<Map<String, dynamic>> list = jsonDecode(json as String).cast<Map<String, dynamic>>();
         var videoStatementList = list.map((e) {
           return VideoItem.fromMap(e);
         }).toList();
@@ -29,22 +29,18 @@ class SharedPrefStorage extends BaseStorage {
   }
 
   @override
-  Future<void> saveVideoList(List<VideoItem> videos) async {
+  Future<void> saveVideoList(List<VideoItem>? videos) async {
     final prefs = await SharedPreferences.getInstance();
 
     try {
       if (videos?.isEmpty ?? true) {
-        await prefs.setString(_videosKey, null);
-        return true;
+        await prefs.remove(_videosKey);
       }
-      final listOfMap = videos.map((e) => e.toMap()).toList();
-      // final json = jsonEncode(videos);
+      final listOfMap = videos!.map((e) => e.toMap()).toList();
       final json = jsonEncode(listOfMap);
       await prefs.setString(_videosKey, json);
-      return true;
     } catch (e, stackTrace) {
       print(e.toString());
-      return false;
     }
   }
 

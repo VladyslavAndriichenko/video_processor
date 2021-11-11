@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 class VideoProcessor {
   final FlutterFFmpeg ffmpeg;
 
-  VideoProcessor({@required this.ffmpeg});
+  VideoProcessor({required this.ffmpeg});
 
   static const combinedVideoBaseName = 'combined_video.mp4';
 

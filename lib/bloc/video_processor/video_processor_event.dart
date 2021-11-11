@@ -11,13 +11,13 @@ class PickUpVideoEvent extends VideoProcessorEvent {
   PickUpVideoEvent(this.context);
 }
 class DeleteSelectedVideosEvent extends VideoProcessorEvent {
-  final List<int> indexesForDelete;
+  final List<int>? indexesForDelete;
 
-  DeleteSelectedVideosEvent({@required this.indexesForDelete});
+  DeleteSelectedVideosEvent({required this.indexesForDelete});
 }
 class SelectVideoListItemEvent extends VideoProcessorEvent {
   final int videoIndex;
 
-  SelectVideoListItemEvent({@required this.videoIndex});
+  SelectVideoListItemEvent({required this.videoIndex});
 }
 class UnselectAllListItemsEvent extends VideoProcessorEvent {}

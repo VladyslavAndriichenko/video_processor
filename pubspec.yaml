@@ -18,27 +18,28 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
 
-  path_provider: ^1.6.11
-  flutter_ffmpeg: ^0.3.1
-  flutter_bloc: ^6.0.1
-  permission_handler: ^5.0.1+1
-  shared_preferences: ^0.5.8
+  path_provider: ^2.0.6
+  flutter_ffmpeg: ^0.4.2
+  flutter_bloc: ^7.3.3
+  permission_handler: ^8.2.6
+  shared_preferences: ^2.0.8
 # todo: write comment ex. maintainable plugin
-  image_picker:
-    git:
-      url: https://github.com/miguelpruivo/plugins
-      ref: 8980d79446d3196bbd0c1366ab67ab2a5f39da9d
-      path: packages/image_picker/image_picker
+#  image_picker:
+#    git:
+#      url: https://github.com/miguelpruivo/plugins
+#      ref: 8980d79446d3196bbd0c1366ab67ab2a5f39da9d
+#      path: packages/image_picker/image_picker
+  image_picker: ^0.8.4+4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.0
+  cupertino_icons: ^1.0.4
 
 dev_dependencies:
   flutter_test:

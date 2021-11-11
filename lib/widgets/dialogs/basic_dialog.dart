@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:video_processor/widgets/buttons/common_button.dart';
 
 class BasicDialog extends StatelessWidget {
-  final String headerText;
-  final String contentText;
+  final String? headerText;
+  final String? contentText;
   final String actionButtonText;
   final Function action;
-  final String action2ButtonText;
-  final Function action2;
+  final String? action2ButtonText;
+  final Function? action2;
 
   final bool useCancel;
 
   const BasicDialog({
-    Key key,
+    Key? key,
     this.headerText,
     this.contentText,
-    @required this.actionButtonText,
+    required this.actionButtonText,
     this.useCancel = false,
-    @required this.action,
+    required this.action,
     this.action2ButtonText,
     this.action2,
   }) : super(key: key);
@@ -35,7 +35,7 @@ class BasicDialog extends StatelessWidget {
             if (headerText != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
-                child: Text(headerText,
+                child: Text(headerText!,
                     // style: TextStyles.cardHeaderTextStyle,
                 ),
               ),
@@ -44,7 +44,7 @@ class BasicDialog extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Text(
-                  contentText,
+                  contentText!,
                   // style: TextStyles.cardContentTextStyle,
                   textAlign: TextAlign.center,
                 ),
@@ -108,9 +108,9 @@ class BasicDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(BuildContext context, Function buttonAction, String label) => CommonButton(
+  Widget _buildActionButton(BuildContext context, Function? buttonAction, String? label) => CommonButton(
     onClick: () {
-      buttonAction();
+      buttonAction!();
       Navigator.of(context).pop();
     },
     buttonText: label,

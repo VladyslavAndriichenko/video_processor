@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class VideoListItemWidget extends StatelessWidget {
-  final String videoName;
-  const VideoListItemWidget({Key key, this.videoName}) : super(key: key);
+  final String? videoName;
+  const VideoListItemWidget({Key? key, this.videoName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

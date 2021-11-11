@@ -2,12 +2,12 @@ import 'dart:convert';
 
 class VideoItem {
   //todo: add ID
-  final String videoName;
+  final String? videoName;
 
   VideoItem({this.videoName,
   });
 
-  VideoItem copyWith({String videoName, String videoText}) => VideoItem(
+  VideoItem copyWith({String? videoName, String? videoText}) => VideoItem(
     videoName: videoName ?? this.videoName,
   );
 

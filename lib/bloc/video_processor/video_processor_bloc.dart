@@ -18,7 +18,7 @@ import 'package:path/path.dart';
 // todo: use bloc version 7+
 class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> {
 
-  final BaseStorage storage;
+  final BaseStorage? storage;
 
   VideoProcessorBloc({this.storage}) : super(VideoProcessorState.uninitialized());
 
@@ -36,21 +36,21 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
   }
 
   Stream<VideoProcessorState> _initializeVideoProcessor(InitializeVideoProcessor event) async* {
-    final savedVideos = await storage.retrieveVideoList();
+    final savedVideos = await storage!.retrieveVideoList();
     yield VideoProcessorState.initialized(videoCardList: savedVideos);
   }
 
   Stream<VideoProcessorState> _pickVideoEvent(PickUpVideoEvent event) async* {
     if (!state.isInitialized()) return;
 
-    final curState = state;
+    final VideoProcessorState curState = state;
 
     yield VideoProcessorState.loading();
-    ImageSource videoSource;
+    ImageSource? videoSource;
 
     await showDialog<bool>(
       useRootNavigator: false,
-      context: globalKey.currentContext,
+      context: globalKey.currentContext!,
       builder: (context) => BasicDialog(
           useCancel: false,
           actionButtonText: 'Gallery',
@@ -69,10 +69,10 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
     if (videoSource == null) return;
 
     final picker = ImagePicker();
-    PickedFile pickedFile;
+    PickedFile? pickedFile;
 // todo: move to new handler
     try {
-      pickedFile = await picker.getVideo(source: videoSource, maxDuration: Duration(seconds: 60));
+      pickedFile = await picker.getVideo(source: videoSource!, maxDuration: Duration(seconds: 60));
 
       if (pickedFile == null || pickedFile.path == null || pickedFile.path.isEmpty) {
         yield curState.copyWith();
@@ -83,8 +83,8 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
 
       if (videoSource == ImageSource.camera) await File(pickedFile.path).delete();
 
-      final newVideoList = curState.videoCardList..add(VideoItem(videoName: basename(cutVideoPath)));
-      await storage.saveVideoList(newVideoList);
+      final newVideoList = curState.videoCardList!..add(VideoItem(videoName: basename(cutVideoPath)));
+      await storage!.saveVideoList(newVideoList);
       yield curState.copyWith(videoCardList: newVideoList);
     } catch (e, stackTrace) {
       yield curState.copyWith(errorMessage: e.toString());
@@ -99,13 +99,13 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
       yield state.copyWith(selectedItemsIndexes: [event.videoIndex], isSelectableMode: true);
     } else {
       ///if contains selected item, do nothing
-      if (state.selectedItemsIndexes.contains(event.videoIndex)) {
-        state.selectedItemsIndexes..remove(event.videoIndex);
+      if (state.selectedItemsIndexes!.contains(event.videoIndex)) {
+        state.selectedItemsIndexes!..remove(event.videoIndex);
         //todo: RELY ON VIDEO ID
         // final list = [...state.selectedItemsIndexes.where((element) => element.id != event.id)];
-        yield state.copyWith(selectedItemsIndexes: state.selectedItemsIndexes..remove(event.videoIndex), isSelectableMode: true);
+        yield state.copyWith(selectedItemsIndexes: state.selectedItemsIndexes!..remove(event.videoIndex), isSelectableMode: true);
       } else {
-        yield state.copyWith(selectedItemsIndexes: state.selectedItemsIndexes..add(event.videoIndex), isSelectableMode: true);
+        yield state.copyWith(selectedItemsIndexes: state.selectedItemsIndexes!..add(event.videoIndex), isSelectableMode: true);
       }
     }
   }
