@@ -32,6 +32,8 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
       yield* _selectVideoListItemEvent(event);
     } else if (event is UnselectAllListItemsEvent) {
       yield* _unselectAllListItemsEvent(event);
+    } else if (event is DeleteSelectedVideosEvent) {
+      yield* _deleteSelectedVideosEvent(event);
     }
   }
 
@@ -95,17 +97,21 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
   Stream<VideoProcessorState> _selectVideoListItemEvent(SelectVideoListItemEvent event) async* {
     if (!state.isInitialized()) return;
 
-    if (state.selectedItemsIndexes?.isEmpty ?? true) {
-      yield state.copyWith(selectedItemsIndexes: [event.videoIndex], isSelectableMode: true);
+    ///if selected items list is empty, init list and add new selection
+    if (state.selectedItemsIds?.isEmpty ?? true) {
+      yield state.copyWith(selectedItemsIds: [event.videoId], isSelectableMode: true);
     } else {
-      ///if contains selected item, do nothing
-      if (state.selectedItemsIndexes!.contains(event.videoIndex)) {
-        state.selectedItemsIndexes!..remove(event.videoIndex);
-        //todo: RELY ON VIDEO ID
-        // final list = [...state.selectedItemsIndexes.where((element) => element.id != event.id)];
-        yield state.copyWith(selectedItemsIndexes: state.selectedItemsIndexes!..remove(event.videoIndex), isSelectableMode: true);
-      } else {
-        yield state.copyWith(selectedItemsIndexes: state.selectedItemsIndexes!..add(event.videoIndex), isSelectableMode: true);
+      ///if contain item, remove
+      if (state.selectedItemsIds!.contains(event.videoId)) {
+        var selectedItems = [...state.selectedItemsIds!];
+        selectedItems..removeWhere((id) => id == event.videoId);
+        yield state.copyWith(selectedItemsIds: selectedItems, isSelectableMode: true);
+      }
+      ///if not, add
+      else {
+        var selectedItems = [...state.selectedItemsIds!];
+        selectedItems..add(event.videoId);
+        yield state.copyWith(selectedItemsIds: selectedItems, isSelectableMode: true);
       }
     }
   }
@@ -113,6 +119,23 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
   Stream<VideoProcessorState> _unselectAllListItemsEvent(UnselectAllListItemsEvent event) async* {
     if (!state.isInitialized()) return;
 
-    yield state.copyWith(selectedItemsIndexes: [], isSelectableMode: false);
+    yield state.copyWith(selectedItemsIds: [], isSelectableMode: false);
+  }
+
+  Stream<VideoProcessorState> _deleteSelectedVideosEvent(DeleteSelectedVideosEvent event) async* {
+    if (!state.isInitialized()) return;
+
+    if (event.videosIds?.isEmpty ?? true) return;
+
+    var allItems = [...state.videoCardList!];
+    allItems.removeWhere((videoItem) => event.videosIds!.contains(videoItem.id));
+
+    try {
+      await storage!.saveVideoList(allItems);
+    } catch (e) {
+      print(e);
+    }
+
+    yield state.copyWith(selectedItemsIds: [], videoCardList: allItems, isSelectableMode: false);
   }
 }

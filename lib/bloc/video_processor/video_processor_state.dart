@@ -5,11 +5,11 @@ enum VideoProcessorStateStatus { uninitialized, initialized, loading }
 class VideoProcessorState {
   final VideoProcessorStateStatus? status;
   final List<VideoItem>? videoCardList;
-  final List<int>? selectedItemsIndexes;
+  final List<int>? selectedItemsIds;
   final bool isSelectableMode;
   final String? errorMessage;
 
-  VideoProcessorState({this.status, this.videoCardList, this.selectedItemsIndexes, this.errorMessage, this.isSelectableMode = false});
+  VideoProcessorState({this.status, this.videoCardList, this.selectedItemsIds, this.errorMessage, this.isSelectableMode = false});
 
   VideoProcessorState.uninitialized() : this(status: VideoProcessorStateStatus.uninitialized, isSelectableMode: false);
 
@@ -22,11 +22,11 @@ class VideoProcessorState {
 
   bool isInitialized() => status == VideoProcessorStateStatus.initialized;
 
-  VideoProcessorState copyWith({VideoProcessorStateStatus? status, List<VideoItem>? videoCardList, List<int>? selectedItemsIndexes, bool? isSelectableMode, String errorMessage = ''}) =>
+  VideoProcessorState copyWith({VideoProcessorStateStatus? status, List<VideoItem>? videoCardList, List<int>? selectedItemsIds, bool? isSelectableMode, String errorMessage = ''}) =>
       VideoProcessorState(
         status: status ?? this.status,
         videoCardList: videoCardList ?? this.videoCardList,
-        selectedItemsIndexes: selectedItemsIndexes ?? this.selectedItemsIndexes,
+        selectedItemsIds: selectedItemsIds ?? this.selectedItemsIds,
         isSelectableMode: isSelectableMode ?? this.isSelectableMode,
         errorMessage: errorMessage,
       );

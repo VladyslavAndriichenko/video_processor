@@ -6,13 +6,13 @@ abstract class VideoProcessorEvent {}
 class InitializeVideoProcessor extends VideoProcessorEvent {}
 class PickAndProcessVideoEvent extends VideoProcessorEvent {}
 class DeleteSelectedVideosEvent extends VideoProcessorEvent {
-  final List<int>? indexesForDelete;
+  final List<int>? videosIds;
 
-  DeleteSelectedVideosEvent({required this.indexesForDelete});
+  DeleteSelectedVideosEvent({required this.videosIds});
 }
 class SelectVideoListItemEvent extends VideoProcessorEvent {
-  final int videoIndex;
+  final int videoId;
 
-  SelectVideoListItemEvent({required this.videoIndex});
+  SelectVideoListItemEvent({required this.videoId});
 }
 class UnselectAllListItemsEvent extends VideoProcessorEvent {}
