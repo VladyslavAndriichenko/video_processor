@@ -16,3 +16,4 @@ class SelectVideoListItemEvent extends VideoProcessorEvent {
   SelectVideoListItemEvent({required this.videoId});
 }
 class UnselectAllListItemsEvent extends VideoProcessorEvent {}
+class CombineVideosEvent extends VideoProcessorEvent {}

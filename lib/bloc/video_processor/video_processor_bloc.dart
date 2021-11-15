@@ -22,20 +22,22 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
 
   VideoProcessorBloc({this.storage}) : super(VideoProcessorState.uninitialized());
 
-  @override
-  Stream<VideoProcessorState> mapEventToState(VideoProcessorEvent event) async* {
-    if (event is InitializeVideoProcessor) {
-      yield* _initializeVideoProcessor(event);
-    } else if (event is PickAndProcessVideoEvent) {
-      yield* _pickAndProcessVideoEvent(event);
-    } else if (event is SelectVideoListItemEvent) {
-      yield* _selectVideoListItemEvent(event);
-    } else if (event is UnselectAllListItemsEvent) {
-      yield* _unselectAllListItemsEvent(event);
-    } else if (event is DeleteSelectedVideosEvent) {
-      yield* _deleteSelectedVideosEvent(event);
-    }
-  }
+  // @override
+  // Stream<VideoProcessorState> mapEventToState(VideoProcessorEvent event) async* {
+  //   if (event is InitializeVideoProcessor) {
+  //     yield* _initializeVideoProcessor(event);
+  //   } else if (event is PickAndProcessVideoEvent) {
+  //     yield* _pickAndProcessVideoEvent(event);
+  //   } else if (event is SelectVideoListItemEvent) {
+  //     yield* _selectVideoListItemEvent(event);
+  //   } else if (event is UnselectAllListItemsEvent) {
+  //     yield* _unselectAllListItemsEvent(event);
+  //   } else if (event is DeleteSelectedVideosEvent) {
+  //     yield* _deleteSelectedVideosEvent(event);
+  //   } else if (event is CombineVideosEvent) {
+  //     yield* _combineVideosEvent(event);
+  //   }
+  // }
 
   Stream<VideoProcessorState> _initializeVideoProcessor(InitializeVideoProcessor event) async* {
     final savedVideos = await storage!.retrieveVideoList();
@@ -137,5 +139,18 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
     }
 
     yield state.copyWith(selectedItemsIds: [], videoCardList: allItems, isSelectableMode: false);
+  }
+
+  Stream<VideoProcessorState> _combineVideosEvent(CombineVideosEvent event) async* {
+    if (!state.isInitialized()) return;
+
+    if (state.videoCardList?.isEmpty ?? true) return;
+
+    try {
+      await VideoProcessor(ffmpeg: FlutterFFmpeg()).combineVideosReturnFileName(state.videoCardList!.map((videoItem) => videoItem.videoName).toList());
+    } catch (e) {
+      yield state.copyWith(errorMessage: e.toString());
+      return;
+    }
   }
 }

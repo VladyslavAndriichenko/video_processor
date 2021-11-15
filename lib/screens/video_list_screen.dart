@@ -20,62 +20,71 @@ class VideoListScreen extends StatefulWidget {
 class _VideoListScreenState extends State<VideoListScreen> {
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: BlocBuilder<VideoProcessorBloc, VideoProcessorState>(
-            buildWhen: (prev, cur) =>
-                prev.isSelectableMode != cur.isSelectableMode ||
-                prev.selectedItemsIds?.length != cur.selectedItemsIds?.length,
-            builder: (context, state) => Text(state.isSelectableMode
-                ? 'Selected items ${state.selectedItemsIds?.length ?? 0}'
-                : 'Video List'),
-          ),
-          actions: [
-            BlocBuilder<VideoProcessorBloc, VideoProcessorState>(
-              buildWhen: (prev, cur) => prev.isSelectableMode != cur.isSelectableMode,
-              builder: (context, state) => Visibility(
-                visible: state.isSelectableMode,
-                child: Container(
-                  margin: EdgeInsets.only(right: 10),
-                  child: IconButton(
-                    splashRadius: 30,
-                    icon: Icon(Icons.close),
-                    onPressed: () {
-                      context.read<VideoProcessorBloc>().add(UnselectAllListItemsEvent());
-                    },
+    return WillPopScope(
+      onWillPop: () async {
+        if (context.read<VideoProcessorBloc>().state.isSelectableMode) {
+          context.read<VideoProcessorBloc>().add(UnselectAllListItemsEvent());
+          return false;
+        }
+        return true;
+      },
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            title: BlocBuilder<VideoProcessorBloc, VideoProcessorState>(
+              buildWhen: (prev, cur) =>
+                  prev.isSelectableMode != cur.isSelectableMode ||
+                  prev.selectedItemsIds?.length != cur.selectedItemsIds?.length,
+              builder: (context, state) => Text(state.isSelectableMode
+                  ? 'Selected items ${state.selectedItemsIds?.length ?? 0}'
+                  : 'Video List'),
+            ),
+            actions: [
+              BlocBuilder<VideoProcessorBloc, VideoProcessorState>(
+                buildWhen: (prev, cur) => prev.isSelectableMode != cur.isSelectableMode,
+                builder: (context, state) => Visibility(
+                  visible: state.isSelectableMode,
+                  child: Container(
+                    margin: EdgeInsets.only(right: 10),
+                    child: IconButton(
+                      splashRadius: 30,
+                      icon: Icon(Icons.close),
+                      onPressed: () {
+                        context.read<VideoProcessorBloc>().add(UnselectAllListItemsEvent());
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-        body: BlocConsumer<VideoProcessorBloc, VideoProcessorState>(
-          listener: (context, state) {
-            // if (state.) {
-            //   showDi
-            // }
-          },
-          builder: (context, state) {
-            if (state.isLoading()) {
-              return Center(child: CircularProgressIndicator());
-            }
-            return Container(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: buildVideoListView(state, context),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 18),
-                    child: buildButtons(context, state),
-                  ),
-                ],
-              ),
-            );
-          },
+            ],
+          ),
+          body: BlocConsumer<VideoProcessorBloc, VideoProcessorState>(
+            listener: (context, state) {
+              // if (state.) {
+              //   showDi
+              // }
+            },
+            builder: (context, state) {
+              if (state.isLoading()) {
+                return Center(child: CircularProgressIndicator());
+              }
+              return Container(
+                padding: EdgeInsets.symmetric(vertical: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: buildVideoListView(state, context),
+                    ),
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 18),
+                      child: buildButtons(context, state),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -108,16 +117,30 @@ class _VideoListScreenState extends State<VideoListScreen> {
           ),
         ),
         SizedBox(width: 20),
+        if (state.isSelectableMode)
         Expanded(
           child: CommonButton(
             onClick: (state.selectedItemsIds?.isEmpty ?? true)
                 ? null
                 : () {
+              context
+                  .read<VideoProcessorBloc>()
+                  .add(DeleteSelectedVideosEvent(videosIds: state.selectedItemsIds));
+            },
+            buttonText: 'Delete videos',
+          ),
+        ),
+        if (!state.isSelectableMode)
+        Expanded(
+          child: CommonButton(
+            onClick: (state.videoCardList?.isEmpty ?? true)
+                ? null
+                : () {
                     context
                         .read<VideoProcessorBloc>()
-                        .add(DeleteSelectedVideosEvent(videosIds: state.selectedItemsIds));
+                        .add(CombineVideosEvent());
                   },
-            buttonText: 'Delete videos',
+            buttonText: 'Combine videos',
           ),
         )
       ],

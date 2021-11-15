@@ -15,7 +15,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     SchedulerBinding.instance!.addPostFrameCallback((timeStamp) {
-      Navigator.of(context).pushNamed(videoListScreenRoute);
+      Navigator.of(context).pushReplacementNamed(videoListScreenRoute);
     });
   }
 
