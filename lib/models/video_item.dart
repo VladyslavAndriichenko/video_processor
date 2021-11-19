@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class VideoItem {
-  final int? id;
+  final int id;
   final String videoName;
 
   VideoItem({required this.id, this.videoName = ''});

@@ -3,23 +3,23 @@ import 'package:video_processor/models/video_item.dart';
 enum VideoProcessorStateStatus { uninitialized, initialized, loading }
 
 class VideoProcessorState {
-  final VideoProcessorStateStatus? status;
-  final List<VideoItem>? videoCardList;
+  final VideoProcessorStateStatus status;
+  final List<VideoItem> videoCardList;
   final bool hasCombinedVideo;
-  final List<int>? selectedItemsIds;
+  final List<int> selectedItemsIds;
   final bool isSelectableMode;
-  final String? errorMessage;
+  final String errorMessage;
 
-  VideoProcessorState(
-      {this.status,
-      this.videoCardList,
+  const VideoProcessorState(
+      {this.status = VideoProcessorStateStatus.uninitialized,
+      this.videoCardList = const <VideoItem>[],
       this.hasCombinedVideo = false,
-      this.selectedItemsIds,
-      this.errorMessage,
+      this.selectedItemsIds = const <int>[],
+      this.errorMessage = '',
       this.isSelectableMode = false});
 
-  VideoProcessorState.uninitialized()
-      : this(status: VideoProcessorStateStatus.uninitialized, isSelectableMode: false);
+  // VideoProcessorState.uninitialized()
+  //     : this(status: VideoProcessorStateStatus.uninitialized, isSelectableMode: false);
 
   VideoProcessorState.loading()
       : this(
@@ -27,7 +27,7 @@ class VideoProcessorState {
         );
 
   VideoProcessorState.initialized({List<VideoItem>? videoCardList})
-      : this(status: VideoProcessorStateStatus.initialized, videoCardList: videoCardList ?? []);
+      : this(status: VideoProcessorStateStatus.initialized, videoCardList: videoCardList ?? <VideoItem>[]);
 
   bool isLoading() => status == VideoProcessorStateStatus.loading;
 

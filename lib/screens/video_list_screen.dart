@@ -34,9 +34,9 @@ class _VideoListScreenState extends State<VideoListScreen> {
             title: BlocBuilder<VideoProcessorBloc, VideoProcessorState>(
               buildWhen: (prev, cur) =>
                   prev.isSelectableMode != cur.isSelectableMode ||
-                  prev.selectedItemsIds?.length != cur.selectedItemsIds?.length,
+                  prev.selectedItemsIds.length != cur.selectedItemsIds.length,
               builder: (context, state) => Text(state.isSelectableMode
-                  ? 'Selected items ${state.selectedItemsIds?.length ?? 0}'
+                  ? 'Selected items ${state.selectedItemsIds.length}'
                   : 'Video List'),
             ),
             actions: [
@@ -120,7 +120,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
         if (state.isSelectableMode)
         Expanded(
           child: CommonButton(
-            onClick: (state.selectedItemsIds?.isEmpty ?? true)
+            onClick: (state.selectedItemsIds.isEmpty)
                 ? null
                 : () {
               context
@@ -133,7 +133,7 @@ class _VideoListScreenState extends State<VideoListScreen> {
         if (!state.isSelectableMode)
         Expanded(
           child: CommonButton(
-            onClick: (state.videoCardList?.isEmpty ?? true)
+            onClick: (state.videoCardList.isEmpty)
                 ? null
                 : () {
                     context
@@ -151,13 +151,13 @@ class _VideoListScreenState extends State<VideoListScreen> {
     return ListView(
       physics: BouncingScrollPhysics(),
       children: indexedMap<Widget, VideoItem>(
-        state.videoCardList?.isEmpty ?? true ? List.empty() : state.videoCardList!,
+        state.videoCardList.isEmpty ? List.empty() : state.videoCardList,
         (index, videoItem) => VideoListItemWidget(
           videoName: videoItem.videoName,
           selectionEvent: () {
             context
                 .read<VideoProcessorBloc>()
-                .add(SelectVideoListItemEvent(videoId: videoItem.id!));
+                .add(SelectVideoListItemEvent(videoId: videoItem.id));
           },
           id: videoItem.id,
           state: state,

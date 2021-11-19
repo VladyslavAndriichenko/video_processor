@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_ffmpeg/flutter_ffmpeg.dart';
@@ -13,31 +14,35 @@ import 'package:video_processor/utils/video_processor.dart';
 import 'package:video_processor/widgets/dialogs/basic_dialog.dart';
 import 'package:path/path.dart';
 
-// todo: Migrate to flutter 2.0
-// todo: USE linter from provider starter
-// todo: use bloc version 7+
 class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> {
 
   final BaseStorage? storage;
 
-  VideoProcessorBloc({this.storage}) : super(VideoProcessorState.uninitialized());
+  VideoProcessorBloc({this.storage}) : super(const VideoProcessorState());
 
-  // @override
-  // Stream<VideoProcessorState> mapEventToState(VideoProcessorEvent event) async* {
-  //   if (event is InitializeVideoProcessor) {
-  //     yield* _initializeVideoProcessor(event);
-  //   } else if (event is PickAndProcessVideoEvent) {
-  //     yield* _pickAndProcessVideoEvent(event);
-  //   } else if (event is SelectVideoListItemEvent) {
-  //     yield* _selectVideoListItemEvent(event);
-  //   } else if (event is UnselectAllListItemsEvent) {
-  //     yield* _unselectAllListItemsEvent(event);
-  //   } else if (event is DeleteSelectedVideosEvent) {
-  //     yield* _deleteSelectedVideosEvent(event);
-  //   } else if (event is CombineVideosEvent) {
-  //     yield* _combineVideosEvent(event);
-  //   }
-  // }
+  // on<InitializeVideoProcessor>((event, emit) => _initializeVideoProcessor(event));
+  // on<PickAndProcessVideoEvent>((event, emit) => _pickAndProcessVideoEvent(event));
+  // on<SelectVideoListItemEvent>((event, emit) => _selectVideoListItemEvent(event));
+  // on<UnselectAllListItemsEvent>((event, emit) => _unselectAllListItemsEvent(event));
+  // on<DeleteSelectedVideosEvent>((event, emit) => _deleteSelectedVideosEvent(event));
+  // on<CombineVideosEvent>((event, emit) => _combineVideosEvent(event));
+
+  @override
+  Stream<VideoProcessorState> mapEventToState(VideoProcessorEvent event) async* {
+    if (event is InitializeVideoProcessor) {
+      yield* _initializeVideoProcessor(event);
+    } else if (event is PickAndProcessVideoEvent) {
+      yield* _pickAndProcessVideoEvent(event);
+    } else if (event is SelectVideoListItemEvent) {
+      yield* _selectVideoListItemEvent(event);
+    } else if (event is UnselectAllListItemsEvent) {
+      yield* _unselectAllListItemsEvent(event);
+    } else if (event is DeleteSelectedVideosEvent) {
+      yield* _deleteSelectedVideosEvent(event);
+    } else if (event is CombineVideosEvent) {
+      yield* _combineVideosEvent(event);
+    }
+  }
 
   Stream<VideoProcessorState> _initializeVideoProcessor(InitializeVideoProcessor event) async* {
     final savedVideos = await storage!.retrieveVideoList();
@@ -87,7 +92,7 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
       ///delete video which picked from camera
       if (videoSource == ImageSource.camera) await File(pickedFile.path).delete();
 
-      final newVideoList = curState.videoCardList!..add(VideoItem(id: DateTime.now().millisecondsSinceEpoch, videoName: basename(cutVideoPath)));
+      final newVideoList = curState.videoCardList..add(VideoItem(id: DateTime.now().millisecondsSinceEpoch, videoName: basename(cutVideoPath)));
       await storage!.saveVideoList(newVideoList);
       yield curState.copyWith(videoCardList: newVideoList);
     } catch (e, stackTrace) {
@@ -100,18 +105,18 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
     if (!state.isInitialized()) return;
 
     ///if selected items list is empty, init list and add new selection
-    if (state.selectedItemsIds?.isEmpty ?? true) {
+    if (state.selectedItemsIds.isEmpty) {
       yield state.copyWith(selectedItemsIds: [event.videoId], isSelectableMode: true);
     } else {
       ///if contain item, remove
-      if (state.selectedItemsIds!.contains(event.videoId)) {
-        var selectedItems = [...state.selectedItemsIds!];
+      if (state.selectedItemsIds.contains(event.videoId)) {
+        var selectedItems = [...state.selectedItemsIds];
         selectedItems..removeWhere((id) => id == event.videoId);
         yield state.copyWith(selectedItemsIds: selectedItems, isSelectableMode: true);
       }
       ///if not, add
       else {
-        var selectedItems = [...state.selectedItemsIds!];
+        var selectedItems = [...state.selectedItemsIds];
         selectedItems..add(event.videoId);
         yield state.copyWith(selectedItemsIds: selectedItems, isSelectableMode: true);
       }
@@ -127,10 +132,10 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
   Stream<VideoProcessorState> _deleteSelectedVideosEvent(DeleteSelectedVideosEvent event) async* {
     if (!state.isInitialized()) return;
 
-    if (event.videosIds?.isEmpty ?? true) return;
+    if (event.videosIds.isEmpty) return;
 
-    var allItems = [...state.videoCardList!];
-    allItems.removeWhere((videoItem) => event.videosIds!.contains(videoItem.id));
+    var allItems = [...state.videoCardList];
+    allItems.removeWhere((videoItem) => event.videosIds.contains(videoItem.id));
 
     try {
       await storage!.saveVideoList(allItems);
@@ -144,10 +149,10 @@ class VideoProcessorBloc extends Bloc<VideoProcessorEvent, VideoProcessorState> 
   Stream<VideoProcessorState> _combineVideosEvent(CombineVideosEvent event) async* {
     if (!state.isInitialized()) return;
 
-    if (state.videoCardList?.isEmpty ?? true) return;
+    if (state.videoCardList.isEmpty) return;
 
     try {
-      await VideoProcessor(ffmpeg: FlutterFFmpeg()).combineVideosReturnFileName(state.videoCardList!.map((videoItem) => videoItem.videoName).toList());
+      await VideoProcessor(ffmpeg: FlutterFFmpeg()).combineVideosReturnFileName(state.videoCardList.map((videoItem) => videoItem.videoName).toList());
     } catch (e) {
       yield state.copyWith(errorMessage: e.toString());
       return;
